@@ -9,6 +9,7 @@ public class Labyrinth {
     private positionCoordinate currentPosition, entry, exit;
     private boolean finish = false;
     private int countCommand = 0;
+    private long start, end;
     private Queue<String> Queue = new LinkedList<String>();
     public Scanner inputCommands = new Scanner(System.in);
 
@@ -18,6 +19,7 @@ public class Labyrinth {
     }
 
     public void RunMaze(){
+        this.start = System.currentTimeMillis();
         this.entry = searchEntryorExit(this.laby, "E");
         this.exit = searchEntryorExit(this.laby, "S");
         this.currentPosition = entry;
@@ -26,16 +28,12 @@ public class Labyrinth {
         ShowLab();
         while (finish == false)
         {
+            System.out.print("Insira o comando desejado: ");
             String Move = inputCommands.nextLine();
             movePosition(Move);
+        }
 
-        }
-        if(Queue.isEmpty() == true) {
-            if(laby[currentPosition.line][currentPosition.col] == laby[exit.line][exit.col])
-            {
-                System.out.println("Você conseguiu!!!");
-            }
-        }
+        this.end = System.currentTimeMillis();
     }
 
     private void movePosition(String Move) {
@@ -82,7 +80,8 @@ public class Labyrinth {
                 break;
             case "Começar":
             case "start":
-                while (Queue.isEmpty() == false && finish == false){
+                System.out.println("Imprimindo caminho digitado:\n");
+                while (!Queue.isEmpty() && !finish){
                     String[] Actualposition = Queue.peek().split(";");
                     int line = Integer.parseInt(Actualposition[0]);
                     int col = Integer.parseInt(Actualposition[1]);
@@ -91,13 +90,27 @@ public class Labyrinth {
                     Queue.remove();
                 }
 
+                if(laby[currentPosition.line][currentPosition.col].equals(laby[exit.line][exit.col]))
+                {
+                    System.out.println("Você conseguiu!!!");
+                    System.out.printf("Tempo em ms: "+ "%.3f ms%n", (start - end) / 1000d);
+                }
+                else
+                {
+                    System.out.println("O caminho que você digitou não encontrou a saida");
+                    System.out.printf("Tempo em ms: "+ "%.3f ms%n", (start - end) / 1000d);
+                }
+
+
+                finish =true;
+
                 break;
         }
 
     }
 
     private void CleanQueue(){
-        while (Queue.isEmpty() == false){
+        while (!Queue.isEmpty()){
             Queue.remove();
         }
     }
@@ -106,13 +119,15 @@ public class Labyrinth {
         this.countCommand += 1;
         if(!laby[line][col].equals(laby[exit.line][exit.col]) || !laby[line][col].equals(laby[entry.line][entry.col]) ) {
 
-            if (laby[line][col] == "#")
+            if (laby[line][col].equals("#"))
             {
                 CleanQueue();
                 this.laby = this.InitialLaby;
                 this.countCommand = 0;
                 finish = true;
-                System.out.println("Que pena, o movimento que você escolheu é invalido!! \n Mas não fique triste, você acaba de ganhar um 'Jogo da Vida'");
+                System.out.println("Que pena, o movimento que você escolheu é invalido!! \nMas não fique triste, você acaba de ganhar um 'Jogo da Vida'");
+                System.out.printf("Tempo em ms: "+ "%.3f ms%n", (start - end) / 1000d);
+                System.exit(0);
             }
             else if (move.equals("Cima") || move.equals("Baixo"))
             {
@@ -155,7 +170,7 @@ public class Labyrinth {
                 }
             }
         }
-        if(found == false){
+        if(!found){
             throw new RuntimeException("Não foi encontrada nenhuma entrada ou saida");
         }
         return new positionCoordinate(-1,-1);
@@ -164,7 +179,7 @@ public class Labyrinth {
     private void ShowLab()
     {
         PrintArray();
-        System.out.println("Programe seus passos para chegar até o 'E'");
+        System.out.println("Programe seus passos para chegar até o 'S'");
         System.out.println("Comandos enfilerados: " + Queue.size());
         System.out.println("Comandos disponiveis: \n" +
                 "- Direita / d \n" +
