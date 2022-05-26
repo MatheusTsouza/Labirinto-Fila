@@ -1,98 +1,140 @@
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Stack;
+import java.util.Queue;
+import java.util.Scanner;
+
 
 public class Labyrinth {
-
-    private String[][] laby;
-    public Stack stackMove = new Stack();
-    public Stack stackCordinate = new Stack<>();
-    public positionCoordinate currentPosition;
-    public positionCoordinate entry;
-    public positionCoordinate exit;
+    private String[][] laby, InitialLaby;
+    private positionCoordinate currentPosition, entry, exit;
+    private boolean finish = false;
+    private int countCommand = 0;
+    private Queue<String> Queue = new LinkedList<String>();
+    public Scanner inputCommands = new Scanner(System.in);
 
     public Labyrinth(String[][] laby){
         this.laby = laby;
+        this.InitialLaby = this.laby;
     }
 
-    public void retrivePathToExit(){
+    public void RunMaze(){
+        this.currentPosition = entry;
+        Queue.add(entry.retriveCordinate() + ";Entrada");
+        ShowLab();
+        while (finish == false)
+        {
+            String Move = inputCommands.nextLine();
+            movePosition(Move);
 
-        this.entry = searchEntryorExit(this.laby,"E");
+        }
+        if(Queue.isEmpty() == true) {
+            if(laby[currentPosition.line][currentPosition.col] == laby[exit.line][exit.col])
+            {
+                System.out.println("Você conseguiu!!!");
+            }
+        }
+    }
+
+    private void movePosition(String Move) {
+        this.entry = searchEntryorExit(this.laby, "E");
         this.exit = searchEntryorExit(this.laby, "S");
 
+        positionCoordinate positionDown = new positionCoordinate(currentPosition.line + 1, currentPosition.col);
+        positionCoordinate positionUp = new positionCoordinate(currentPosition.line - 1, currentPosition.col);
+        positionCoordinate positionLeft = new positionCoordinate(currentPosition.line, currentPosition.col - 1);
+        positionCoordinate positionRight = new positionCoordinate(currentPosition.line, currentPosition.col + 1);
 
-        this.currentPosition = entry;
+        switch (Move) {
+            case "Direita":
+            case "d":
+                Queue.add(positionRight.retriveCordinate() + ";Direita");
+                this.currentPosition = positionRight;
+                ShowLab();
+                break;
 
-        stackMove.push("Entrada");
-        stackCordinate.push(entry.retriveCordinate());
+            case "Esquerda":
+            case "e":
+                Queue.add(positionLeft.retriveCordinate() + ";Esquerda");
+                this.currentPosition = positionLeft;
+                ShowLab();
+                break;
 
+            case "Cima":
+            case "c":
+                Queue.add(positionUp.retriveCordinate() + ";Cima");
+                this.currentPosition = positionUp;
+                ShowLab();
+                break;
 
+            case "Baixo":
+            case "b":
+                Queue.add(positionDown.retriveCordinate() + ";Baixo");
+                this.currentPosition = positionDown;
+                ShowLab();
+                break;
 
-        while (!laby[currentPosition.line][currentPosition.col].equals("S")){
-            movePosition(currentPosition);
+            case "Reniciar":
+            case "r":
+                System.out.println("Reiniciando Labirinto");
+                CleanQueue();
+                break;
+            case "Começar":
+            case "start":
+                while (Queue.isEmpty() == false && finish == false){
+                    String[] Actualposition = Queue.peek().split(";");
+                    int line = Integer.parseInt(Actualposition[0]);
+                    int col = Integer.parseInt(Actualposition[1]);
+                    String move = Actualposition[2];
+                    WalkInMaze(line,col, move);
+                    Queue.remove();
+                }
+
+                break;
         }
-
-        showStack();
 
     }
 
+    private void CleanQueue(){
+        while (Queue.isEmpty() == false){
+            Queue.remove();
+        }
+    }
 
-   public void movePosition(positionCoordinate currentPosition)
-   {
+    private void WalkInMaze(int line, int col, String move){
+        System.out.println(line + "" + col + move);
+        this.countCommand += 1;
+        if(!laby[line][col].equals(laby[exit.line][exit.col]) || !laby[line][col].equals(laby[entry.line][entry.col]) ) {
 
-       positionCoordinate positionDown = new positionCoordinate(currentPosition.line + 1, currentPosition.col);
-       positionCoordinate positionUp = new positionCoordinate(currentPosition.line - 1, currentPosition.col);
-       positionCoordinate positionLeft = new positionCoordinate(currentPosition.line, currentPosition.col - 1);
-       positionCoordinate positionRight = new positionCoordinate(currentPosition.line, currentPosition.col + 1);
+            if (laby[line][col] == "#")
+            {
+                CleanQueue();
+                this.laby = this.InitialLaby;
+                this.countCommand = 0;
+                finish = true;
+                System.out.println("Que pena, o movimento que você escolheu é invalido!! \n Mas não fique triste, você acaba de ganhar um 'Jogo da Vida'");
+            }
+            else if (move.equals("Cima") || move.equals("Baixo"))
+            {
+                laby[line][col] = "|";
+            }
+            else if (move.equals("Direita") || move.equals("Esquerda"))
+            {
+                laby[line][col] = "-";
+            }
+            System.out.println("Comando "+this.countCommand +": " + move);
+            PrintArray();
+        }
+    }
 
+    private void PrintArray(){
 
-
-
-       if(Objects.equals(laby[positionUp.line][positionUp.col], " ") || Objects.equals(laby[positionUp.line][positionUp.col], "S")){
-           if(!Objects.equals(laby[positionUp.line][positionUp.col], "S")){
-               laby[positionUp.line][positionUp.col] = "=";
-           }
-           this.currentPosition = positionUp;
-           stackMove.push("Moved Up");
-           stackCordinate.push(positionUp.retriveCordinate());
-           
-       } else if (Objects.equals(laby[positionRight.line][positionRight.col], " ") || Objects.equals(laby[positionRight.line][positionRight.col], "S")) {
-           if(!Objects.equals(laby[positionRight.line][positionRight.col], "S")){
-               laby[positionRight.line][positionRight.col] = "=";
-           }
-           this.currentPosition = positionRight;
-           stackMove.push("Moved Right");
-           stackCordinate.push(positionRight.retriveCordinate());
-           
-       } else if (Objects.equals(laby[positionDown.line][positionDown.col], " ") || Objects.equals(laby[positionDown.line][positionDown.col], "S")) {
-           if (!Objects.equals(laby[positionDown.line][positionDown.col], "S")){
-               laby[positionDown.line][positionDown.col] = "=";
-           }
-           this.currentPosition = positionDown;
-           stackMove.push("Moved Down");
-           stackCordinate.push(positionDown.retriveCordinate());
-
-       } else if (Objects.equals(laby[positionLeft.line][positionLeft.col], " ") || Objects.equals(laby[positionLeft.line][positionLeft.col], "S")) {
-           if (!Objects.equals(laby[positionLeft.line][positionLeft.col], "S")){
-               laby[positionLeft.line][positionLeft.col] = "=";
-           }
-           this.currentPosition = positionLeft;
-           stackMove.push("Moved left");
-           stackCordinate.push(positionLeft.retriveCordinate());
-
-       } else{
-           String lastPosition = (String) stackCordinate.peek();
-           String[] cord = lastPosition.split(",");
-
-           int line = Integer.parseInt(cord[0]);
-           int col = Integer.parseInt(cord[1]);
-
-           this.currentPosition = new positionCoordinate(line,col);
-           stackCordinate.pop();
-           stackMove.pop();
-
-       }
-
-   }
+        for (int l = 0; l < laby.length; l++)  {
+            for (int c = 0; c < laby[0].length; c++)     {
+                System.out.print(laby[l][c] + " "); //imprime caracter a caracter
+            }
+            System.out.println(" "); //muda de linha
+        }
+    }
 
     private positionCoordinate searchEntryorExit(String[][] laby, String item){
 
@@ -118,11 +160,20 @@ public class Labyrinth {
         return new positionCoordinate(-1,-1);
     }
 
-    public void showStack(){
-        System.out.println("Cordenadas até a saida:");
-        for (Object item: stackCordinate) {
-            System.out.println(item.toString());
-        }
+    private void ShowLab()
+    {
+        PrintArray();
+        System.out.println("Programe seus passos para chegar até o 'E'");
+        System.out.println("Comandos enfilerados: " + Queue.size());
+        System.out.println("Comandos disponiveis: \n" +
+                "- Direita / d \n" +
+                "- Esquerda / e \n" +
+                "- Cima / c \n" +
+                "- Baixo / b \n" +
+                "- Começar / start \n" +
+                "- Reiniciar / r \n"
+        );
+
     }
 
 }

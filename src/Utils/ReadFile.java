@@ -1,46 +1,35 @@
 package Utils;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ReadFile{
 
 
-    public String[][] RetrivebyArray(String directory) {
-        String[][] response = new String[50][50];
+    public String[][] RetrivebyArray(String directory) throws IOException {
 
-        try {
+        int contCol = 0;
+        String filePath = new File("").getAbsolutePath();
+        String Path = filePath +"/labyrinths"+ "/"+ directory;
+        FileReader dir = new FileReader(Path);
+        Path path = Paths.get(Path);
 
-            FileReader dir = new FileReader(directory);
-            BufferedReader readFile = new BufferedReader(dir);
+        BufferedReader readFile = new BufferedReader(dir);
+        String line = readFile.readLine();
 
-            String line = readFile.readLine();
-            int cont = 0;
-            while (line != null){
+        String[][] response = new String[(int)Files.lines(path).count()][line.length()];
 
-                for(int i = 0; i < line.length(); i++){
-
-                    response[cont][i] = String.valueOf(line.charAt(i));
-
-                }
-                cont += 1;
-                line = readFile.readLine();
-                    
-                }
-
-            return response;
-
-
+        while (line != null)
+        {
+            for(int i = 0; i < line.length(); i++)
+            {
+                response[contCol][i] = String.valueOf(line.charAt(i));
             }
-        catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
+            contCol += 1;
+            line = readFile.readLine();
         }
-        catch (IOException e){
-            e.getMessage();
-        }
-
         return response;
     }
 
