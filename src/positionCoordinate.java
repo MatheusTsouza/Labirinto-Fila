@@ -8,7 +8,7 @@ public class positionCoordinate {
     }
 
     public String retriveCordinate(){
-        return (this.line +","+ this.col);
+        return (this.line +";"+ this.col);
     }
 
 }

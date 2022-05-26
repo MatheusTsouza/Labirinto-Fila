@@ -18,8 +18,11 @@ public class Labyrinth {
     }
 
     public void RunMaze(){
+        this.entry = searchEntryorExit(this.laby, "E");
+        this.exit = searchEntryorExit(this.laby, "S");
         this.currentPosition = entry;
-        Queue.add(entry.retriveCordinate() + ";Entrada");
+
+
         ShowLab();
         while (finish == false)
         {
@@ -36,8 +39,7 @@ public class Labyrinth {
     }
 
     private void movePosition(String Move) {
-        this.entry = searchEntryorExit(this.laby, "E");
-        this.exit = searchEntryorExit(this.laby, "S");
+
 
         positionCoordinate positionDown = new positionCoordinate(currentPosition.line + 1, currentPosition.col);
         positionCoordinate positionUp = new positionCoordinate(currentPosition.line - 1, currentPosition.col);
@@ -101,7 +103,6 @@ public class Labyrinth {
     }
 
     private void WalkInMaze(int line, int col, String move){
-        System.out.println(line + "" + col + move);
         this.countCommand += 1;
         if(!laby[line][col].equals(laby[exit.line][exit.col]) || !laby[line][col].equals(laby[entry.line][entry.col]) ) {
 
