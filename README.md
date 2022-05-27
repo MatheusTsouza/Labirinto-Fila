@@ -1,4 +1,4 @@
-# Labirinto-Fila
+# Labirinto-Fila - Andrey silveira e Matheus Souza
 
 Este projeto tem como objetivo descobrir a saída de um labirinto utilizando Fila. Nele é lido um arquivo txt que contém o labirinto (labyrinths/labyrinth1.txt), para descobiri a saida o programa começa pela entrad que é marcada pela letra "E", após isso ele permite o usuario criar uma rota até a saida com os comandos: 
 - Direita / d 
